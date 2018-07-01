@@ -1,3 +1,3 @@
 # Woosong-food-guide
-pneumatic framework
-우
+공압 구조
+음식점 메뉴
