@@ -9,9 +9,9 @@ import java.util.Vector;
  */
 public class Main extends JFrame {
     private JTextField storeName;
-    private JTextField openTime;
-    private JTextField closeTime;
-    private JTextField phone;
+    private JTextField foodName;
+    private JTextField price;
+    private JTextField foodFiled;
     private JButton clearButton;
     private JButton istbt;
     private DefaultTableModel model;
@@ -21,25 +21,25 @@ public class Main extends JFrame {
 
     public Main() {
 
-        String[] header = new String[]{"식당 이름", "오픈 시간", "마감 시간", "전화번호" };
+        String[] header = new String[]{"id","음식 이름","가격","식당 이름", "분야" };
         String[][] data = null;
 
         storeName.addFocusListener(new changeListener());
-        openTime.addFocusListener(new changeListener());
-        closeTime.addFocusListener(new changeListener());
-        phone.addFocusListener(new changeListener());
+        foodName.addFocusListener(new changeListener());
+        price.addFocusListener(new changeListener());
+        foodFiled.addFocusListener(new changeListener());
 
         clearButton.addActionListener(e -> {
-            JTextField arr[] = {storeName, openTime, closeTime, phone};
-            for (int i=0;i<6;i++)
+            JTextField arr[] = {foodName, price, storeName, foodFiled, };
+            for (int i=0;i<4;i++)
                 arr[i].setText("");});
 
         istbt.addActionListener(e -> {
             try {
                 Connection con = dbconnect.makeConnection();
 
-                String sq = "INSERT INTO woosong.storeinfo(name, opentime, closetime, phone) VALUES";
-                sq+="('" + GetStoreName() + "','"+GetOpentime()+ "','"+ GetClosetime()+ "','" + GetPhoneFiled() +"')";
+                String sq = "INSERT INTO woosong.woosongfood(menu, price, storename, field) VALUES";
+                sq+="('" + GetFoodName() + "','" + GetPrice() + "','" + GetStoreName() + "','"+ GetFoodFiled() +"')";
 
                 PreparedStatement stmt = con.prepareStatement(sq);
                 int i =stmt.executeUpdate();
@@ -64,7 +64,7 @@ public class Main extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 DelBt.addActionListener(e1->{
                     JTable target = (JTable) e.getSource();
-                    delete_item(((String) model.getValueAt(target.getSelectedRow(), 0)));
+                    delete_item(Integer.parseInt((String) model.getValueAt(target.getSelectedRow(), 0)));
                 });
 
             }
@@ -73,21 +73,20 @@ public class Main extends JFrame {
 
     }
 
+    private String GetFoodName() {
+        return foodName.getText();
+    }
 
     private String GetStoreName() {
         return storeName.getText();
     }
 
-    private String GetOpentime() {
-        return openTime.getText();
+    private String GetPrice() {
+        return price.getText();
     }
 
-    private String GetClosetime() {
-        return closeTime.getText();
-    }
-
-    private String GetPhoneFiled() {
-        return phone.getText();
+    private String GetFoodFiled() {
+        return foodFiled.getText();
     }
 
 
@@ -111,7 +110,7 @@ public class Main extends JFrame {
     }
 
     private void select() {
-        String sql = "SELECT  name, opentime, closetime, phone FROM woosong.storeinfo ORDER BY name ;";
+        String sql = "SELECT  id, menu, price, storename, field FROM woosong.woosongfood ORDER BY id;";
         ResultSet rs = null;
         PreparedStatement stmt = null;
 
@@ -123,10 +122,11 @@ public class Main extends JFrame {
             model.setRowCount(0);
             while (rs.next()) {
                 Vector<String> cont = new Vector<>();
-                cont.add(rs.getString("name"));
-                cont.add(rs.getString("opentime"));
-                cont.add(rs.getString("closeTime"));
-                cont.add(rs.getString("phone"));
+                cont.add(rs.getString("id"));
+                cont.add(rs.getString("menu"));
+                cont.add(rs.getString("price"));
+                cont.add(rs.getString("storename"));
+                cont.add(rs.getString("field"));
                 model.addRow(cont);
             }
 
@@ -146,8 +146,8 @@ public class Main extends JFrame {
         }
     }
 
-    private void delete_item(String deStoreName) {
-        String sql = "DELETE FROM woosong.storeinfo WHERE name=" + deStoreName;
+    private void delete_item(int id) {
+        String sql = "DELETE FROM woosong.woosongfood WHERE id=" + id;
         int result;
         PreparedStatement stmt = null;
 
